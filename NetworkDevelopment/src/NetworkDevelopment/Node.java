@@ -2,14 +2,16 @@ package NetworkDevelopment;
 import java.util.ArrayList;
 
 import repast.simphony.context.Context;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.graph.Network;
+import repast.simphony.space.graph.RepastEdge;
 
 
 public class Node {
 	String id;
 	double weight;
-	Context context;
-	Network network;
+	Context<?> context;
+	Network<Node> network;
 	
 	ArrayList<DataAttribute> attributeList;
 	
@@ -19,7 +21,7 @@ public class Node {
 		this.weight = 1;
 	}
 	
-	Node(String id, Context context, Network<Node> network)
+	Node(String id, Context<?> context, Network<Node> network)
 	{
 		this.id = id;
 		this.weight = 1;
@@ -64,6 +66,56 @@ public class Node {
 	{
 		this.id = id;
 		this.weight = weight;
+	}
+	
+	@ScheduledMethod(start = 1, interval = 10)
+	public void step() {
+			
+		double changeChance = Math.random();
+		if(changeChance < 0.6 && network != null)
+		{
+			Iterable<RepastEdge<Node>> edges = network.getEdges(this);
+			boolean removed = false;
+			Node removeNode = null;
+			for(RepastEdge<?> e : edges)
+			{
+				if(Math.random() < 0.2 && !removed)
+				{
+					Node src = (Node) e.getSource();
+					if(src.id == this.id )
+						removeNode = (Node) e.getTarget();
+					else
+						removeNode = (Node) e.getSource();
+					removed = true;
+					
+				}
+			}
+			RepastEdge<Node> e = new RepastEdge<Node>(this, removeNode, true);
+			if(removeNode != null && network.containsEdge(e))
+			{
+				System.out.println("Removing edge between " + this.id + " and " + removeNode.id );
+				
+				network.removeEdge(e);
+			}
+			
+			//Now add a random edge.
+			boolean added = false;
+			Iterable<Node> nodes = network.getNodes();
+			for(Node n: nodes)
+			{
+				if(!added)
+				{
+					if(Math.random() < 0.2)
+					{
+						System.out.println("Adding edge between " + this.id + " and " + n.id);
+						network.addEdge(this, n);
+						added = true;
+					}
+				}
+			}
+		}
+		System.out.println("FINISHED WORKING ON " + this.id + "-------------------------");
+
 	}
 	
 	public void setAttributeList(ArrayList<DataAttribute> list)

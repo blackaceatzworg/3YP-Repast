@@ -19,10 +19,10 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 		context.setId("NetworkDevelopment");
 		NetworkBuilder<Node> builder = new NetworkBuilder("TestNet", context, true);
 		Network<Node> net = builder.buildNetwork();
-		context.add(new Node("n0"));
-		context.add(new Node("n1"));
-		context.add(new Node("n2"));
-		context.add(new Node("n3"));
+		context.add(new Node("n0", context, net));
+		context.add(new Node("n1", context, net));
+		context.add(new Node("n2", context, net));
+		context.add(new Node("n3", context, net));
 		
 		IndexedIterable<Object> startNodes = context.getObjects(Node.class);
 		net.addEdge((Node)startNodes.get(0), (Node)startNodes.get(1));
@@ -32,7 +32,7 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 		
 		//net.addEdge((Node)startNodes.get(1), (Node)startNodes.get(0));
 		
-		int nodeCount = 100;
+		int nodeCount = 10;
 		for( int i = 2; i < nodeCount ; i ++) {
 			context.add(new Node("n" + i, context, net));
 		}
