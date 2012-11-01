@@ -29,11 +29,11 @@ public class Node {
 		this.context = context;
 		
 		Iterable<Node> nodes = network.getNodes();
-		System.out.println("WORKING ON NODE " + id);
+		//System.out.println("WORKING ON NODE " + id);
 		ArrayList<ArrayList<Node>> newEdges = new ArrayList<ArrayList<Node>>();
 		for(Node current : nodes)
 		{
-			System.out.println("Checking " + id + " against " + current.id);
+			//System.out.println("Checking " + id + " against " + current.id);
 			double iDegree = network.getDegree(current);
 			double jSumDegree = 0;
 			for(Node n : network.getNodes())
@@ -43,7 +43,7 @@ public class Node {
 			}
 			
 			double prob = iDegree / jSumDegree;
-			System.out.println("PROB: " + prob + " SUM-J " + jSumDegree + " I " + iDegree);
+			//System.out.println("PROB: " + prob + " SUM-J " + jSumDegree + " I " + iDegree);
 			if(Math.random() <= prob)
 			{
 				/*network.addEdge(this, current);*/
@@ -51,7 +51,7 @@ public class Node {
 				pair.add(this);
 				pair.add(current);
 				newEdges.add(pair);
-				System.out.println("\tAdding edge");
+				//System.out.println("\tAdding edge");
 			}
 		}
 		
@@ -68,54 +68,68 @@ public class Node {
 		this.weight = weight;
 	}
 	
-	@ScheduledMethod(start = 1, interval = 10)
+	@ScheduledMethod(start = 1, interval = 100)
 	public void step() {
 			
-		double changeChance = Math.random();
-		if(changeChance < 0.6 && network != null)
+
+		//System.out.println("Removing an edge from " + this.id + "..."); 
+		Iterable<RepastEdge<Node>> edges = network.getEdges(this);
+		boolean removed = false;
+		RepastEdge rmEdge = null;
+		double rmvRnd = Math.random();
+		int rmCount = 0;
+		int rmIndex = (int)Math.round(Math.random() * network.getDegree(this));
+		
+		if(rmvRnd < 0.3)
 		{
-			Iterable<RepastEdge<Node>> edges = network.getEdges(this);
-			boolean removed = false;
-			Node removeNode = null;
+			//System.out.println("REMOVING INDEX " + rmIndex + " from node " + this.id);
 			for(RepastEdge<?> e : edges)
 			{
-				if(Math.random() < 0.2 && !removed)
+				if(rmCount == rmIndex)
 				{
 					Node src = (Node) e.getSource();
 					if(src.id == this.id )
-						removeNode = (Node) e.getTarget();
+						rmEdge = e;
 					else
-						removeNode = (Node) e.getSource();
-					removed = true;
-					
+						rmEdge = e;
 				}
+				rmCount++;
 			}
-			RepastEdge<Node> e = new RepastEdge<Node>(this, removeNode, true);
-			if(removeNode != null && network.containsEdge(e))
+			//System.out.println("e is an edge between " + this.id + " and " + removeNode.id);
+			if(rmEdge != null) 
 			{
-				System.out.println("Removing edge between " + this.id + " and " + removeNode.id );
 				
-				network.removeEdge(e);
-			}
-			
-			//Now add a random edge.
-			boolean added = false;
-			Iterable<Node> nodes = network.getNodes();
-			for(Node n: nodes)
-			{
-				if(!added)
+				/*System.out.println("Removing edge between " + this.id + " and " + removeNode.id );
+				System.out.println(network.containsEdge(eSrc) + " " +network.containsEdge(eDest));*/
+				if( network.containsEdge(rmEdge))
 				{
-					if(Math.random() < 0.2)
-					{
-						System.out.println("Adding edge between " + this.id + " and " + n.id);
-						network.addEdge(this, n);
-						added = true;
-					}
+					//System.out.println("Removing");
+					network.removeEdge(rmEdge);
 				}
 			}
 		}
-		System.out.println("FINISHED WORKING ON " + this.id + "-------------------------");
-
+		
+		//Now add a random edge.
+		boolean added = false;
+		Iterable<Node> nodes = network.getNodes();
+		double rnd = Math.random();
+		int counter = 0;
+		int index = (int)Math.round(Math.random() * network.getDegree(this));
+		if(rnd < 0.7)
+		{
+			for(Node n: nodes)
+			{
+				if(counter == index)
+				{
+					//System.out.println("Adding edge between " + this.id + " and " + n.id);
+					network.addEdge(this, n);
+					added = true;
+				}
+				counter++;
+			}
+		}
+		
+		//System.out.println("Number of Edges in graph: " + network.numEdges());
 	}
 	
 	public void setAttributeList(ArrayList<DataAttribute> list)
