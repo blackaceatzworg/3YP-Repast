@@ -1,5 +1,7 @@
 package NetworkDevelopment;
 
+import java.util.ArrayList;
+
 import org.apache.poi.hssf.record.formula.functions.T;
 
 import repast.simphony.context.Context;
@@ -29,13 +31,30 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 		net.addEdge((Node)startNodes.get(1), (Node)startNodes.get(2));
 		net.addEdge((Node)startNodes.get(2), (Node)startNodes.get(3));
 		net.addEdge((Node)startNodes.get(3), (Node)startNodes.get(0));
-		
+
 		//net.addEdge((Node)startNodes.get(1), (Node)startNodes.get(0));
 		
-		int nodeCount = 100;
+		int nodeCount = 500;
 		for( int i = 2; i < nodeCount ; i ++) {
 			context.add(new Node("n" + i, context, net));
 		}
+		
+		//Remove all detached nodes, they don't add anything.
+		//Temporary 'Feature'
+		Iterable<Node> nodes = net.getNodes();
+		ArrayList<Node> removeList = new ArrayList<Node>();
+		for(Node n: nodes)
+		{
+			if(net.getDegree(n) == 0)
+				removeList.add(n);
+		} 
+		for(Node n: removeList)
+		{
+			context.remove(n);
+		}
+		
+		//Now go through and reciprocate all joins
+		
 		
 		
 		/*NetworkGenerator gen = new WattsBetaSmallWorldGenerator(0.2, 2, false);

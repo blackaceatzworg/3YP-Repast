@@ -1,18 +1,25 @@
 package NetworkDevelopment;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.graph.RepastEdge;
 
-
 public class Node {
 	String id;
-	double weight;
-	Context<?> context;
-	Network<Node> network;
+	private double weight;
+	private Context<?> context;
+	private Network<Node> network;
 	
+	
+	private boolean smokes;
+	private double peerPressure;
+	private double willPower;
 	ArrayList<DataAttribute> attributeList;
 	
 	Node(String id)
@@ -28,30 +35,45 @@ public class Node {
 		this.network = network;
 		this.context = context;
 		
+		if(Math.random() < 0.5)
+			this.smokes = true;
+		else
+			this.smokes = false;
+		
+		this.peerPressure = Math.random();
+		this.willPower = Math.random();
+		DecimalFormat df = new DecimalFormat("#.00");
+		
+		this.id = this.id + " " + df.format(this.peerPressure);
+		
+		//Add to scale-free network
 		Iterable<Node> nodes = network.getNodes();
-		//System.out.println("WORKING ON NODE " + id);
+
 		ArrayList<ArrayList<Node>> newEdges = new ArrayList<ArrayList<Node>>();
 		for(Node current : nodes)
 		{
-			//System.out.println("Checking " + id + " against " + current.id);
 			double iDegree = network.getDegree(current);
 			double jSumDegree = 0;
 			for(Node n : network.getNodes())
 			{
 				jSumDegree += network.getDegree(n);
-				//System.out.println("NODE " + n.id + " has degree " +network.getDegree(n) );
 			}
 			
 			double prob = iDegree / jSumDegree;
-			//System.out.println("PROB: " + prob + " SUM-J " + jSumDegree + " I " + iDegree);
+			if(this.isSmoker() != current.isSmoker())
+				prob = prob * 0.5;
+			
 			if(Math.random() <= prob)
 			{
-				/*network.addEdge(this, current);*/
 				ArrayList<Node> pair = new ArrayList<Node>();
 				pair.add(this);
 				pair.add(current);
 				newEdges.add(pair);
-				//System.out.println("\tAdding edge");
+				
+				ArrayList<Node> rPair = new ArrayList<Node>();
+				rPair.add(current);
+				rPair.add(this);
+				newEdges.add(rPair);
 			}
 		}
 		
@@ -73,6 +95,85 @@ public class Node {
 			
 
 		//System.out.println("Removing an edge from " + this.id + "..."); 
+		Iterable<RepastEdge<Node>> edges = network.getInEdges(this);
+		boolean removed = false;
+		RepastEdge rmEdge = null;
+		//Check connected nodes - if smoker, add to count
+		int localSmokerCount = 0;
+		int localNonSmokerCount = 0;
+		
+		for(RepastEdge<?> e : edges)
+		{
+			Node src = (Node) e.getSource();
+		
+			
+			if(src.smokes)
+				localSmokerCount++;
+			else
+				localNonSmokerCount++;
+		}
+		
+		//work out the net smokers
+		//normalise to 0-1 (0.5 being net 0 smokers)
+		if((localSmokerCount + localNonSmokerCount) > 0)
+		{
+			double normalisedDiff = Math.abs(localSmokerCount - localNonSmokerCount) / (localSmokerCount + localNonSmokerCount);
+			double smokingChance = this.peerPressure * normalisedDiff;
+			
+			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+			Date date = new Date();
+			
+			if(localSmokerCount > localNonSmokerCount)
+			{
+				if(!this.smokes)
+				{
+					if(Math.random() < smokingChance)
+					{
+						this.smokes = true;
+						System.out.println(dateFormat.format(date) + " " + this.getID() + " just started smoking!");
+					}
+					else
+						this.smokes = false;
+				}
+			}
+			else if(localSmokerCount < localNonSmokerCount)
+			{
+				if(this.smokes)
+				{
+					//CHANGE THIS OLOLOLOL
+					if(Math.random() < smokingChance * willPower)
+					{
+						this.smokes = false;
+						
+						System.out.println(dateFormat.format(date) + " " + this.getID() + " just gave up smoking!");
+					}
+					else
+						this.smokes = true;
+				}
+			}
+			
+		}
+		
+		//Now pick a random node and consider adding an edge
+		Node newNode = network.getRandomAdjacent(this);
+		//double startProb = 
+		
+
+	}
+	
+	public boolean isSmoker()
+	{
+		return this.smokes;
+	}
+	
+	public String getID()
+	{
+		return this.id;
+	}
+	
+	private void randomChange() 
+	{
+		//System.out.println("Removing an edge from " + this.id + "..."); 
 		Iterable<RepastEdge<Node>> edges = network.getEdges(this);
 		boolean removed = false;
 		RepastEdge rmEdge = null;
@@ -80,7 +181,7 @@ public class Node {
 		int rmCount = 0;
 		int rmIndex = (int)Math.round(Math.random() * network.getDegree(this));
 		
-		if(rmvRnd < 0.3)
+		if(rmvRnd < 0.7)
 		{
 			//System.out.println("REMOVING INDEX " + rmIndex + " from node " + this.id);
 			for(RepastEdge<?> e : edges)
@@ -115,7 +216,7 @@ public class Node {
 		double rnd = Math.random();
 		int counter = 0;
 		int index = (int)Math.round(Math.random() * network.getDegree(this));
-		if(rnd < 0.7)
+		if(rnd < 0.3)
 		{
 			for(Node n: nodes)
 			{
