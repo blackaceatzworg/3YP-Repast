@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.apache.poi.hssf.record.formula.functions.T;
 
+import edu.uci.ics.jung.graph.Graph;
+
 import repast.simphony.context.Context;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.context.space.graph.NetworkGenerator;
@@ -34,10 +36,12 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 
 		//net.addEdge((Node)startNodes.get(1), (Node)startNodes.get(0));
 		
-		int nodeCount = 500;
+		int nodeCount = 1;
 		for( int i = 2; i < nodeCount ; i ++) {
 			context.add(new Node("n" + i, context, net));
 		}
+		
+		
 		
 		//Remove all detached nodes, they don't add anything.
 		//Temporary 'Feature'
@@ -55,7 +59,14 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 		
 		//Now go through and reciprocate all joins
 		
+		AnalysisTools.repastNetworkToGraphML(context, net, "test.graphml");
+		StanfordParser sp = new StanfordParser("soc-Epinions1.txt");
+		sp.Parse();
 		
+		Graph<String, Long> testGraph;
+		testGraph = sp.toGraph();
+		
+		System.out.println("Nodes: " + testGraph.getVertexCount());
 		
 		/*NetworkGenerator gen = new WattsBetaSmallWorldGenerator(0.2, 2, false);
 		

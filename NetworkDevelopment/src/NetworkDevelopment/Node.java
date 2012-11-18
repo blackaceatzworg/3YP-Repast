@@ -10,7 +10,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.graph.RepastEdge;
 
-public class Node {
+public class Node implements Comparable{
 	String id;
 	private double weight;
 	private Context<?> context;
@@ -60,8 +60,8 @@ public class Node {
 			}
 			
 			double prob = iDegree / jSumDegree;
-			if(this.isSmoker() != current.isSmoker())
-				prob = prob * 0.5;
+			/*if(this.isSmoker() != current.isSmoker())
+				prob = prob * 0.5;*/
 			
 			if(Math.random() <= prob)
 			{
@@ -169,6 +169,10 @@ public class Node {
 	public String getID()
 	{
 		return this.id;
+	}
+	public void setID(String id)
+	{
+		this.id = id;
 	}
 	
 	private void randomChange() 
@@ -290,6 +294,13 @@ public class Node {
 		}
 		else
 			return false;
+	}
+
+	@Override
+	public int compareTo(Object arg0) {
+		// TODO Auto-generated method stub
+		Node other = (Node) arg0;
+		return this.id.compareTo(other.getID());
 	}
 	
 }

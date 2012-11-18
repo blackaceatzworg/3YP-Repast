@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<graph edgedefault="directed">
+    <node id="n0 .13"/>
+    <node id="n1 .85"/>
+    <node id="n2 .58"/>
+    <node id="n3 .56"/>
+    <edge directed="true" target="n1 .85" source="n0 .13" id="0"/>
+    <edge directed="true" target="n2 .58" source="n1 .85" id="1"/>
+    <edge directed="true" target="n3 .56" source="n2 .58" id="2"/>
+    <edge directed="true" target="n0 .13" source="n3 .56" id="3"/>
+</graph>

@@ -36,6 +36,7 @@ public class StanfordParser {
 			
 			//Code from http://www.roseindia.net/java/beginners/java-write-to-file.shtml
 			while ((strLine = br.readLine()) != null)   {
+				System.out.println(strLine);
 				if(strLine.startsWith("#") == true )
 				{
 					fileComments += strLine + "\n";

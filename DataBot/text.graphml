@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<graph edgedefault="undirected">
+    <node id="a"/>
+    <node id="b"/>
+    <node id="c"/>
+    <edge id="1" source="a" target="b" directed="false"/>
+    <edge id="2" source="b" target="c" directed="false"/>
+    <edge id="3" source="c" target="a" directed="false"/>
+</graph>
