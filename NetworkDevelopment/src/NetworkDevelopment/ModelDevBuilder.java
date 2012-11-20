@@ -36,7 +36,7 @@ public class ModelDevBuilder implements ContextBuilder<Object> {
 
 		//net.addEdge((Node)startNodes.get(1), (Node)startNodes.get(0));
 		
-		int nodeCount = 1;
+		int nodeCount = 1300;
 		for( int i = 2; i < nodeCount ; i ++) {
 			context.add(new Node("n" + i, context, net));
 		}

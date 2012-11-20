@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -75,7 +76,7 @@ public class AnalysisTools {
 		System.out.println("GraphML Creation Finished");
 	}
 	
-	public static void JUNGGraphToGraphML(Graph<Node, Node> g, String filename)
+	public static void JUNGGraphToGraphML(Graph<String, Long> g, String filename)
 	{
 		GraphMLObject template = new GraphMLObject();
 		String headerString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -85,18 +86,18 @@ public class AnalysisTools {
 				"http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">";
 		
 		boolean directed = false;
-		ArrayList<Node> nodesToRemove = new ArrayList<Node>();
-		for(Node l : g.getVertices())
+		ArrayList<String> nodesToRemove = new ArrayList<String>();
+		for(String l : g.getVertices())
 		{
 			template.addXMLNode("n" + l.toString());
 		}
 		
-		for(Node l : g.getEdges())
+		for(Long l : g.getEdges())
 		{
 			//For each edge, we need the end points as well
 			if(g.getEdgeType(l) == EdgeType.DIRECTED)
 				directed = true;
-			Pair<Node> vPair = g.getEndpoints(l);
+			Pair<String> vPair = g.getEndpoints(l);
 			if(g.containsVertex(vPair.getFirst()) && g.containsVertex(vPair.getSecond()))
 				template.addEdge("e" + l.toString(), "n" + vPair.getFirst().toString(), "n" + vPair.getSecond().toString(), directed);
 		}
@@ -119,24 +120,28 @@ public class AnalysisTools {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println("GraphML Created.");
 	}
 	
-	public Graph<Object, Object> SnowballSampler(Graph<Object, Object> inGraph, int sampleSize)
+	public static Graph<String, Long> SnowballSampler(Graph<String, Long> inGraph, int sampleSize)
 	{
-		Graph<Object, Object> rtnGraph = new SparseMultigraph<Object, Object>();
+		Graph<String, Long> rtnGraph = new SparseMultigraph<String, Long>();
 		
 		int sampleCount = 0;
-		Collection<Object> vertices = rtnGraph.getVertices();
-		Iterator<Object> vertIter = vertices.iterator();
+		Collection<String> vertices = inGraph.getVertices();
+		Iterator<String> vertIter = vertices.iterator();
 		boolean startVFound = false;
 		int startVCount = 0;
 		int startVertexIndex = Math.round((float)(Math.random() * inGraph.getVertexCount()));
-		
-		Object startVertex = null;
+		System.out.println("Start at " + startVertexIndex);
+		String startVertex = null;
 		while(vertIter.hasNext() && !startVFound)
 		{
+			//System.out.println("Node is " + startVCount);
 			if(startVCount == startVertexIndex)
 			{
+				System.out.println("Here!");
 				startVertex = vertIter.next();
 			}
 			else
@@ -150,41 +155,107 @@ public class AnalysisTools {
 			
 			sampleCount++;
 		
-			Collection<Object> currentVertexBoundary;
-			Collection<Object> workingEdgeSet = inGraph.getOutEdges(startVertex);
-			Iterator<Object> edgeSet = workingEdgeSet.iterator();
+			//Collection<Object> currentVertexBoundary;
+			//Collection<Object> workingEdgeSet = inGraph.getOutEdges(startVertex);
+			//Iterator<Object> edgeSet = workingEdgeSet.iterator();
+			ArrayList<String> vertexSet = new ArrayList<String>();
+			vertexSet.add(startVertex);
 			//Now grab the out edges
-			Object currVertex = startVertex;
-			Pair<Object> workingPair;
-			while(sampleCount < sampleSize)
-			{
-				while(edgeSet.hasNext())
-				{
-					workingPair = inGraph.getEndpoints(edgeSet.next());
-					if(workingPair.getFirst().equals(startVertex))
-					{
-						rtnGraph.addVertex(workingPair.getSecond());
-						currentVertexBoundary.add(workingPair.getSecond());
-						
-					}
-					else
-					{
-						rtnGraph.addVertex(workingPair.getFirst());			
-						currentVertexBoundary.add(workingPair.getFirst());
-					}
-					rtnGraph.addEdge(null, workingPair, EdgeType.DIRECTED);
-					
-				}
-				
-			}
+//			Object currVertex = startVertex;
+//			Pair<Object> workingPair;
+			
+			return SnowballSampler(inGraph, rtnGraph, vertexSet, sampleSize);
+			
+			//while < sampleSize
+			//for each current Vertex Boundary
+			//	Iterate over workingEdgeSet
+				//	if node not in graph, add it
+				//		add to vertex boundary
+				//	if edge not in graph, add it
+			//	get rid of edge set
+			//	expand next currVertexBoundary edge into edgeSet
+			
+		
+			
+//			while(sampleCount < sampleSize)
+//			{
+//				while(edgeSet.hasNext())
+//				{
+//					workingPair = inGraph.getEndpoints(edgeSet.next());
+//					if(workingPair.getFirst().equals(startVertex))
+//					{
+//						rtnGraph.addVertex(workingPair.getSecond());
+//						currentVertexBoundary.add(workingPair.getSecond());
+//						
+//					}
+//					else
+//					{
+//						rtnGraph.addVertex(workingPair.getFirst());			
+//						currentVertexBoundary.add(workingPair.getFirst());
+//					}
+//					rtnGraph.addEdge(null, workingPair, EdgeType.DIRECTED);
+//					
+//				}
+//				
+//			}
 			
 			//add nodes to vertex boundary
 			
 		}
+		else
+			return null;
 		
 	}
-	//get all next nodes
-	//for each node, get next nodes
-
+	//for each in nodeSet
+	//	Expand to get all edges
+	//	if other v not in rtnGraph
+	//		add it to rtnGraph, with edge
+	//		add it to nextNodeSet
+	//	elif edge not in rtnGraph
+	//		add it
+	//if(rtnGraph size < sampleSize)
+	//	call self
+	//else
+	//	return rtnGraph
+	
+	private static Graph<String, Long> SnowballSampler(Graph<String, Long> inGraph, Graph<String, Long> currGraph, List<String> vertexSet, int sampleSize)
+	{
+		Collection<Long> workingEdgeSet; 
+		Iterator<Long> edgeIter;
+		Pair<String> workingPair;
+		List<String> nextVertexSet = new ArrayList<String>();
+		
+		String newNode;
+		
+		System.out.println("Graph size is " + currGraph.getVertexCount());
+		for(String o : vertexSet)
+		{
+			workingEdgeSet = inGraph.getOutEdges(o);
+			edgeIter = workingEdgeSet.iterator();
+			
+			while(edgeIter.hasNext())
+			{
+				Long currentEdge = edgeIter.next();
+				workingPair = inGraph.getEndpoints(currentEdge);
+				if(workingPair.getFirst().equals(o))
+					newNode = workingPair.getSecond();
+				else
+					newNode = workingPair.getFirst();
+				
+				if(!currGraph.containsVertex(newNode))
+				{
+					currGraph.addVertex(newNode);
+					nextVertexSet.add(newNode);
+				}
+				if(!currGraph.containsEdge(currentEdge))
+					currGraph.addEdge(currentEdge, workingPair, EdgeType.DIRECTED);
+			}
+		}
+		
+		if(currGraph.getVertexCount() < sampleSize)
+			currGraph = SnowballSampler(inGraph, currGraph, nextVertexSet, sampleSize);
+		
+		return currGraph;
+	}
 	
 }
