@@ -14,5 +14,7 @@ public class SamplerMain {
 		testGraph = sp.toGraph();
 		
 		System.out.println("Nodes: " + testGraph.getVertexCount());
+		
+		
 	}
 }
