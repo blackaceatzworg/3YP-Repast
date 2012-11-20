@@ -6,6 +6,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -14,10 +16,12 @@ import javax.xml.bind.Marshaller;
 import org.apache.poi.hssf.record.formula.functions.T;
 
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
 import repast.simphony.context.Context;
+import repast.simphony.relogo.ide.dynamics.NetLogoSystemDynamicsParser.intg_return;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.graph.RepastEdge;
 
@@ -116,5 +120,71 @@ public class AnalysisTools {
 			e.printStackTrace();
 		}
 	}
+	
+	public Graph<Object, Object> SnowballSampler(Graph<Object, Object> inGraph, int sampleSize)
+	{
+		Graph<Object, Object> rtnGraph = new SparseMultigraph<Object, Object>();
+		
+		int sampleCount = 0;
+		Collection<Object> vertices = rtnGraph.getVertices();
+		Iterator<Object> vertIter = vertices.iterator();
+		boolean startVFound = false;
+		int startVCount = 0;
+		int startVertexIndex = Math.round((float)(Math.random() * inGraph.getVertexCount()));
+		
+		Object startVertex = null;
+		while(vertIter.hasNext() && !startVFound)
+		{
+			if(startVCount == startVertexIndex)
+			{
+				startVertex = vertIter.next();
+			}
+			else
+				vertIter.next();
+			startVCount++;
+		}
+		
+		if(startVertex != null)
+		{
+			rtnGraph.addVertex(startVertex);
+			
+			sampleCount++;
+		
+			Collection<Object> currentVertexBoundary;
+			Collection<Object> workingEdgeSet = inGraph.getOutEdges(startVertex);
+			Iterator<Object> edgeSet = workingEdgeSet.iterator();
+			//Now grab the out edges
+			Object currVertex = startVertex;
+			Pair<Object> workingPair;
+			while(sampleCount < sampleSize)
+			{
+				while(edgeSet.hasNext())
+				{
+					workingPair = inGraph.getEndpoints(edgeSet.next());
+					if(workingPair.getFirst().equals(startVertex))
+					{
+						rtnGraph.addVertex(workingPair.getSecond());
+						currentVertexBoundary.add(workingPair.getSecond());
+						
+					}
+					else
+					{
+						rtnGraph.addVertex(workingPair.getFirst());			
+						currentVertexBoundary.add(workingPair.getFirst());
+					}
+					rtnGraph.addEdge(null, workingPair, EdgeType.DIRECTED);
+					
+				}
+				
+			}
+			
+			//add nodes to vertex boundary
+			
+		}
+		
+	}
+	//get all next nodes
+	//for each node, get next nodes
+
 	
 }
