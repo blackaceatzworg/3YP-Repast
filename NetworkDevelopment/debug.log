@@ -1,0 +1,10 @@
+ERROR [main] 2012-11-21 16:25:33,485 saf.core.runtime.Boot - null
+java.lang.NullPointerException
+	at saf.core.runtime.Boot.init(Boot.java:79)
+	at saf.core.runtime.Boot.main(Boot.java:250)
+	at repast.simphony.runtime.RepastMain.main(RepastMain.java:43)
+ERROR [main] 2012-11-21 16:25:33,488 saf.core.runtime.Boot - null
+java.lang.NullPointerException
+	at saf.core.runtime.Boot.run(Boot.java:105)
+	at saf.core.runtime.Boot.main(Boot.java:251)
+	at repast.simphony.runtime.RepastMain.main(RepastMain.java:43)
