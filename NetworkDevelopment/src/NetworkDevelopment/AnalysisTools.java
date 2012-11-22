@@ -164,7 +164,7 @@ public class AnalysisTools {
 //			Object currVertex = startVertex;
 //			Pair<Object> workingPair;
 			
-			return SnowballSampler(inGraph, rtnGraph, vertexSet, sampleSize);
+			return SnowballSampler(inGraph, rtnGraph, vertexSet, sampleSize, rtnGraph.getVertexCount());
 			
 			//while < sampleSize
 			//for each current Vertex Boundary
@@ -218,7 +218,7 @@ public class AnalysisTools {
 	//else
 	//	return rtnGraph
 	
-	private static Graph<String, Long> SnowballSampler(Graph<String, Long> inGraph, Graph<String, Long> currGraph, List<String> vertexSet, int sampleSize)
+	private static Graph<String, Long> SnowballSampler(Graph<String, Long> inGraph, Graph<String, Long> currGraph, List<String> vertexSet, int sampleSize, int prevSize)
 	{
 		Collection<Long> workingEdgeSet; 
 		Iterator<Long> edgeIter;
@@ -252,8 +252,8 @@ public class AnalysisTools {
 			}
 		}
 		
-		if(currGraph.getVertexCount() < sampleSize)
-			currGraph = SnowballSampler(inGraph, currGraph, nextVertexSet, sampleSize);
+		if(currGraph.getVertexCount() < sampleSize  && (prevSize < currGraph.getVertexCount()))
+			currGraph = SnowballSampler(inGraph, currGraph, nextVertexSet, sampleSize, currGraph.getVertexCount());
 		
 		return currGraph;
 	}
