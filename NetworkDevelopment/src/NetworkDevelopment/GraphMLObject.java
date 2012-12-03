@@ -1,6 +1,7 @@
 package NetworkDevelopment;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,6 +30,9 @@ public class GraphMLObject {
 	@XmlAttribute
 	String edgedefault;
 	
+	@XmlElement(name="key", type = XMLNodeKey.class)
+	ArrayList<XMLNodeKey> attrKeys = new ArrayList<XMLNodeKey>();
+	
 	@XmlElement(name = "node", type = XMLNode.class)
 	ArrayList<XMLNode> nodes = new ArrayList<XMLNode>();
 	
@@ -46,14 +50,17 @@ public class GraphMLObject {
 		this.edgedefault = "directed";
 	}
 	
-	GraphMLObject(String id, String attrFor, String attrName, String attrWeight, String attrType, String edgedefault)
+	GraphMLObject(String id, String edgedefault, HashMap<String, Object> attrList)
 	{
 		this.id = id;
-		this.attrFor = attrFor;
-		this.attrName = attrName;
-		this.attrWeight = attrWeight;
-		this.attrType = attrType;
 		this.edgedefault = edgedefault;
+		//Based on code from http://stackoverflow.com/questions/1066589/java-iterate-through-hashmap
+		Iterator iter = attrList.entrySet().iterator();
+		while(iter.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)iter.next();
+			
+		}
 	}
 	
 	public void addEdge(String id, String source, String target)
@@ -66,6 +73,11 @@ public class GraphMLObject {
 	}
 	
 	public void addXMLNode(String id)
+	{
+		nodes.add(new XMLNode(id));
+	}
+	
+	public void addXMLNode(String id, HashMap<String, Object> attrList)
 	{
 		nodes.add(new XMLNode(id));
 	}
@@ -115,7 +127,7 @@ class XMLNode
 {
 	@XmlAttribute
 	String id;
-	ArrayList<Attribute> data = new ArrayList<Attribute>();
+	ArrayList<XMLNodeAttribute> data = new ArrayList<XMLNodeAttribute>();
 	
 	XMLNode()
 	{
@@ -129,24 +141,71 @@ class XMLNode
 	XMLNode(String id, double xCoord, double yCoord)
 	{
 		this.id = id;
-		data.add(new Attribute("x", xCoord));
-		data.add(new Attribute("y", yCoord));
+		data.add(new XMLNodeAttribute("x", xCoord));
+		data.add(new XMLNodeAttribute("y", yCoord));
 	}
-	
-	
-	
 }
 
-class Attribute
+@XmlRootElement(name="data")
+class XMLNodeAttribute
 {
 	@XmlAttribute
 	String key;
 	@XmlElement
 	Object value;
 	
-	Attribute(String key, Object value)
+	XMLNodeAttribute(String key, Object value)
 	{
 		this.key = key;
 		this.value = value;
+	}
+}
+
+class XMLKey
+{
+	@XmlAttribute
+	String key;
+	@XmlElement(name="default")
+	String defaultString;
+	@XmlAttribute(name="attr.name")
+	String attrName;
+	@XmlAttribute(name="attr.type")
+	String attrType;
+	
+	XMLKey(String key, String attrName, String attrType)
+	{
+		this.key = key;
+		this.attrName = attrName;
+		this.attrType = attrType;
+	}
+	
+	XMLKey(String key, String attrName, String attrType, String defaultString)
+	{
+		this.key = key;
+		this.attrName = attrName;
+		this.attrType = attrType;
+		this.defaultString = defaultString;
+	}
+		
+	public String getKey()
+	{
+		return this.key;
+	}
+}
+
+@XmlRootElement(name="key")
+class XMLNodeKey extends XMLKey
+{
+	@XmlAttribute(name="for")
+	String forAttr = "node";
+	
+	XMLNodeKey(String key, String attrName, String attrType)
+	{
+		super(key, attrName, attrType);
+	}
+	
+	XMLNodeKey(String key, String attrName, String attrType, String defaultString)
+	{
+		super(key, attrName, attrType, defaultString);
 	}
 }
