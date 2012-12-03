@@ -228,6 +228,8 @@ public class AnalysisTools {
 		String newNode;
 		
 		System.out.println("Graph size is " + currGraph.getVertexCount());
+		
+		//Snowball sampler needs to pick randomly
 		for(String o : vertexSet)
 		{
 			workingEdgeSet = inGraph.getOutEdges(o);
