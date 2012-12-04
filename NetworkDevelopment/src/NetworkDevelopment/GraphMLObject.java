@@ -77,7 +77,14 @@ public class GraphMLObject {
 
 		return key;
 	}
-	
+	public void addEdge(String id, String source, String target)
+	{
+		edges.add(new Edge(id, source, target));
+	}
+	public void addEdge(String id, String source, String target, boolean directed)
+	{
+		edges.add(new Edge(id, source, target, directed));
+	}
 	public void addEdge(String id, String source, String target, HashMap<String, Object> attrs)
 	{
 		edges.add(new Edge(id, source, target, attrs));
@@ -112,6 +119,7 @@ class Edge
 	@XmlAttribute
 	boolean directed;
 
+	@XmlElement(name="data")
 	ArrayList<XMLAttribute> attrList = new ArrayList<XMLAttribute>();
 	
 	Edge()
@@ -121,6 +129,20 @@ class Edge
 		this.target = null;
 		this.directed = true;
 		
+	}
+	Edge(String id, String source, String target)
+	{
+		this.id = id;
+		this.source = source;
+		this.target = target;
+		this.directed = true;
+	}
+	Edge(String id, String source, String target, boolean directed)
+	{
+		this.id = id;
+		this.source = source;
+		this.target = target;
+		this.directed = directed;
 	}
 	Edge(String id, String source, String target, HashMap<String, Object> attrs)
 	{
@@ -133,6 +155,7 @@ class Edge
 		while(iter.hasNext())
 		{
 			Map.Entry pair = (Map.Entry)iter.next();
+			System.out.println("Adding KEY:" + pair.getKey() + " VAL:" + pair.getValue());
 			attrList.add(new XMLAttribute((String)pair.getKey(), pair.getValue()));
 		}
 	}
@@ -177,18 +200,31 @@ class XMLNode
 }
 
 
-@XmlRootElement(name="data")
+/*@XmlRootElement(name="data")*/
 class XMLAttribute
 {
 	@XmlAttribute
 	String key;
 	@XmlElement
-	Object value;
+	String value;
+	
+	XMLAttribute()
+	{
+		this.key = null;
+		this.value = null;
+	}
 	
 	XMLAttribute(String key, Object value)
 	{
 		this.key = key;
-		this.value = value;
+		if(value instanceof Double)
+			this.value = Double.toString((Double)value);
+		else if(value instanceof Integer)
+			this.value = Integer.toString((Integer)value);
+		else if(value instanceof Long)
+			this.value = Long.toString((Long)value);
+		else
+			this.value = (String)value;
 	}
 }
 
@@ -196,7 +232,7 @@ class XMLAttribute
 class XMLKey
 {
 	@XmlAttribute
-	String key;
+	String id;
 	@XmlElement(name="default")
 	String defaultString;
 	@XmlAttribute(name="attr.name")
@@ -204,16 +240,23 @@ class XMLKey
 	@XmlAttribute(name="attr.type")
 	String attrType;
 	
+	XMLKey()
+	{
+		this.id = null;
+		this.attrName = null;
+		this.attrType = null;
+	}
+	
 	XMLKey(String key, String attrName, String attrType)
 	{
-		this.key = key;
+		this.id = key;
 		this.attrName = attrName;
 		this.attrType = attrType;
 	}
 	
 	XMLKey(String key, String attrName, String attrType, String defaultString)
 	{
-		this.key = key;
+		this.id = key;
 		this.attrName = attrName;
 		this.attrType = attrType;
 		this.defaultString = defaultString;
@@ -221,7 +264,7 @@ class XMLKey
 		
 	public String getKey()
 	{
-		return this.key;
+		return this.id;
 	}
 }
 
@@ -230,6 +273,11 @@ class XMLNodeKey extends XMLKey
 {
 	@XmlAttribute(name="for")
 	String forAttr = "node";
+	
+	XMLNodeKey()
+	{
+		super();
+	}
 	
 	XMLNodeKey(String key, String attrName, String attrType)
 	{
@@ -247,6 +295,10 @@ class XMLEdgeKey extends XMLKey
 	@XmlAttribute(name="for")
 	String forAttr = "edge";
 	
+	XMLEdgeKey()
+	{
+		super();
+	}
 	XMLEdgeKey(String key, String attrName, String attrType)
 	{
 		super(key, attrName, attrType);

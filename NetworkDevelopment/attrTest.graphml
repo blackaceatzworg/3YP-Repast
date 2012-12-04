@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<graph edgedefault="directed" id="g1">
+    <key for="edge" attr.type="double" attr.name="mofo" id="de0">
+        <default>0</default>
+    </key>
+    <node id="n1"/>
+    <node id="n2"/>
+    <node id="n3"/>
+    <node id="n4"/>
+    <edge directed="true" target="n2" source="n1" id="e1">
+        <data key="de0">
+            <value>1.2</value>
+        </data>
+    </edge>
+    <edge directed="true" target="n3" source="n2" id="e2">
+        <data key="de0">
+            <value>0.1</value>
+        </data>
+    </edge>
+    <edge directed="true" target="n4" source="n3" id="e3">
+        <data key="de0">
+            <value>0.4</value>
+        </data>
+    </edge>
+    <edge directed="true" target="n1" source="n4" id="e4">
+        <data key="de0">
+            <value>2.0</value>
+        </data>
+    </edge>
+</graph>
