@@ -1,11 +1,78 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<graph edgedefault="directed">
-    <node id="n0 .13"/>
-    <node id="n1 .85"/>
-    <node id="n2 .58"/>
-    <node id="n3 .56"/>
-    <edge directed="true" target="n1 .85" source="n0 .13" id="0"/>
-    <edge directed="true" target="n2 .58" source="n1 .85" id="1"/>
-    <edge directed="true" target="n3 .56" source="n2 .58" id="2"/>
-    <edge directed="true" target="n0 .13" source="n3 .56" id="3"/>
+<?xml version="1.0" encoding="UTF-8"?><graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+<key attr.name="label" attr.type="string" for="node" id="label"/>
+<key attr.name="Edge Label" attr.type="string" for="edge" id="edgelabel"/>
+<key attr.name="weight" attr.type="double" for="edge" id="weight"/>
+<key attr.name="Edge Id" attr.type="string" for="edge" id="edgeid"/>
+<key attr.name="r" attr.type="int" for="node" id="r"/>
+<key attr.name="g" attr.type="int" for="node" id="g"/>
+<key attr.name="b" attr.type="int" for="node" id="b"/>
+<key attr.name="x" attr.type="float" for="node" id="x"/>
+<key attr.name="y" attr.type="float" for="node" id="y"/>
+<key attr.name="size" attr.type="float" for="node" id="size"/>
+<key attr.name="testattr" attr.type="string" for="node" id="testattr"/>
+<graph edgedefault="undirected">
+<node id="1">
+<data key="testattr">a</data>
+<data key="size">10.0</data>
+<data key="r">153</data>
+<data key="g">153</data>
+<data key="b">153</data>
+<data key="x">-1000.2463</data>
+<data key="y">478.21994</data>
+</node>
+<node id="2">
+<data key="testattr">a</data>
+<data key="size">10.0</data>
+<data key="r">153</data>
+<data key="g">153</data>
+<data key="b">153</data>
+<data key="x">-83.96228</data>
+<data key="y">474.5694</data>
+</node>
+<node id="3">
+<data key="testattr">a</data>
+<data key="size">10.0</data>
+<data key="r">153</data>
+<data key="g">153</data>
+<data key="b">153</data>
+<data key="x">-467.26834</data>
+<data key="y">58.408543</data>
+</node>
+<node id="4">
+<data key="testattr">a</data>
+<data key="size">10.0</data>
+<data key="r">153</data>
+<data key="g">153</data>
+<data key="b">153</data>
+<data key="x">489.17154</data>
+<data key="y">-98.564415</data>
+</node>
+<node id="5">
+<data key="testattr">a</data>
+<data key="size">10.0</data>
+<data key="r">153</data>
+<data key="g">153</data>
+<data key="b">153</data>
+<data key="x">-270.1395</data>
+<data key="y">664.39716</data>
+</node>
+<edge source="1" target="4">
+<data key="weight">1.0</data>
+</edge>
+<edge source="1" target="5">
+<data key="weight">1.0</data>
+</edge>
+<edge source="2" target="5">
+<data key="weight">1.0</data>
+</edge>
+<edge source="3" target="2">
+<data key="weight">1.0</data>
+</edge>
+<edge source="4" target="2">
+<data key="weight">1.0</data>
+</edge>
+<edge source="5" target="3">
+<data key="weight">1.0</data>
+</edge>
 </graph>
+</graphml>

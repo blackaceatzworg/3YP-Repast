@@ -1,3 +1,4 @@
+
 package NetworkDevelopment;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +11,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "graph")
+/**
+ * 
+ * @author Matt Smith
+ * 
+ *	This class is used to marshal/unmarshal 
+ */
+@XmlRootElement(name = "graphml")
 public class GraphMLObject {
-	@XmlAttribute
-	String id;
-	
-	@XmlAttribute
-	String edgedefault;
+
+	@XmlAttribute(name="xmlns")
+	String xmlns = "http://graphml.graphdrawing.org/xmlns";
 	
 	//Stores full detail on keys 
 	@XmlElement(name="key", type = XMLNodeKey.class)
@@ -25,23 +30,46 @@ public class GraphMLObject {
 	@XmlElement(name="key", type = XMLEdgeKey.class)
 	ArrayList<XMLEdgeKey> edgeKeyRegister = new ArrayList<XMLEdgeKey>();
 	
-	@XmlElement(name = "node", type = XMLNode.class)
-	ArrayList<XMLNode> nodes = new ArrayList<XMLNode>();
+	@XmlElement
+	Graph graph;
 	
-	@XmlElement(name = "edge", type = Edge.class)
-	ArrayList<Edge> edges = new ArrayList<Edge>();
-	
-
 	GraphMLObject()
 	{
-		this.id = null;
-		this.edgedefault = "directed";
+		this.graph = new Graph(null, "directed");
 	}
 	
 	GraphMLObject(String id, String edgedefault)
 	{
-		this.id = id;
-		this.edgedefault = edgedefault;
+		this.graph = new Graph(id, edgedefault);
+	}
+	
+	public void addEdge(String id, String source, String target)
+	{
+		graph.addEdge(id, source, target);
+	}
+	public void addEdge(String id, String source, String target, boolean directed)
+	{
+		graph.addEdge(id, source, target, directed);
+	}
+	public void addEdge(String id, String source, String target, HashMap<String, Object> attrs)
+	{
+		graph.addEdge(id, source, target, attrs);
+	}
+	public void addEdge(String id, String source, String target, boolean directed, HashMap<String, Object> attrs)
+	{
+		graph.addEdge(id, source, target, directed, attrs);
+	}
+	
+	
+	
+	public void addXMLNode(String id)
+	{
+		graph.addXMLNode(id);
+	}
+	
+	public void addXMLNode(String id, HashMap<String, Object> attrs)
+	{
+		graph.addXMLNode(id, attrs);
 	}
 	
 	/**
@@ -77,6 +105,36 @@ public class GraphMLObject {
 
 		return key;
 	}
+}
+
+@XmlRootElement(name="graph")
+class Graph 
+{
+	@XmlAttribute
+	String id;
+	
+	@XmlAttribute
+	String edgedefault;
+	
+	@XmlElement(name = "node", type = XMLNode.class)
+	ArrayList<XMLNode> nodes = new ArrayList<XMLNode>();
+	
+	@XmlElement(name = "edge", type = Edge.class)
+	ArrayList<Edge> edges = new ArrayList<Edge>();
+	
+
+	Graph()
+	{
+		this.id = null;
+		this.edgedefault = "directed";
+	}
+	
+	Graph(String id, String edgedefault)
+	{
+		this.id = id;
+		this.edgedefault = edgedefault;
+	}
+	
 	public void addEdge(String id, String source, String target)
 	{
 		edges.add(new Edge(id, source, target));
@@ -94,16 +152,17 @@ public class GraphMLObject {
 		edges.add(new Edge(id, source, target, directed, attrs));
 	}
 	
+	
+	
 	public void addXMLNode(String id)
 	{
 		nodes.add(new XMLNode(id));
 	}
 	
-	public void addXMLNode(String id, HashMap<String, Object> attrList)
+	public void addXMLNode(String id, HashMap<String, Object> attrs)
 	{
-		nodes.add(new XMLNode(id));
+		nodes.add(new XMLNode(id, attrs));
 	}
-	
 }
 
 
@@ -155,7 +214,7 @@ class Edge
 		while(iter.hasNext())
 		{
 			Map.Entry pair = (Map.Entry)iter.next();
-			System.out.println("Adding KEY:" + pair.getKey() + " VAL:" + pair.getValue());
+			//System.out.println("Adding KEY:" + pair.getKey() + " VAL:" + pair.getValue());
 			attrList.add(new XMLAttribute((String)pair.getKey(), pair.getValue()));
 		}
 	}
@@ -180,7 +239,8 @@ class XMLNode
 {
 	@XmlAttribute
 	String id;
-	ArrayList<XMLAttribute> data = new ArrayList<XMLAttribute>();
+	@XmlElement(name="data")
+	ArrayList<XMLAttribute> attrList = new ArrayList<XMLAttribute>();
 	
 	XMLNode()
 	{
@@ -191,11 +251,15 @@ class XMLNode
 	{
 		this.id = id;
 	}
-	XMLNode(String id, double xCoord, double yCoord)
+	XMLNode(String id, HashMap<String, Object> attrs)
 	{
 		this.id = id;
-		data.add(new XMLAttribute("x", xCoord));
-		data.add(new XMLAttribute("y", yCoord));
+		Iterator iter = attrs.entrySet().iterator();
+		while(iter.hasNext())
+		{
+			Map.Entry pair = (Map.Entry)iter.next();
+			attrList.add(new XMLAttribute((String)pair.getKey(), pair.getValue()));
+		}
 	}
 }
 
